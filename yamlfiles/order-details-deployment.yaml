@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "order-details"
+  namespace: "default"
+  labels:
+    app: "order-details"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "order-details"
+  template:
+    metadata:
+      labels:
+        app: "order-details"
+    spec:
+      containers:
+      - name: "orderdetails-1"
+        image: "gcr.io/microapp-280010/orderdetails:v5"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "order-details-hpa-lmtu"
+  namespace: "default"
+  labels:
+    app: "order-details"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "order-details"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80

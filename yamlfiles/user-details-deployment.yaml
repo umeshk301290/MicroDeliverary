@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "user-details"
+  namespace: "default"
+  labels:
+    app: "user-details"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "user-details"
+  template:
+    metadata:
+      labels:
+        app: "user-details"
+    spec:
+      containers:
+      - name: "userdetails-1"
+        image: "gcr.io/microapp-280010/userdetails:v4"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "user-details-hpa-txce"
+  namespace: "default"
+  labels:
+    app: "user-details"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "user-details"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
